@@ -17,7 +17,11 @@ namespace Neo.Persistence
 
         public static bool ContainsTransaction(this IPersistence persistence, UInt256 hash)
         {
-            TransactionState state = persistence.Transactions.TryGet(hash);
+            TransactionState state = null;
+            if (persistence != null)
+            {
+                state = persistence.Transactions.TryGet(hash);
+            }
             return state != null;
         }
 

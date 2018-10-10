@@ -43,8 +43,8 @@ namespace Neo
 
         public void StartConsensus(Wallet wallet)
         {
-            Consensus = ActorSystem.ActorOf(ConsensusService.Props(this, wallet));
-            Consensus.Tell(new ConsensusService.Start());
+            Consensus = ActorSystem.ActorOf(SingleService.Props(this, wallet));
+            Consensus.Tell(new SingleService.Start());
         }
 
         public void StartNode(int port = 0, int ws_port = 0)

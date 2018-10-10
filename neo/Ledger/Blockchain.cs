@@ -99,7 +99,7 @@ namespace Neo.Ledger
                         {
                             AssetId = GoverningToken.Hash,
                             Value = GoverningToken.Amount,
-                            ScriptHash = Contract.CreateMultiSigRedeemScript(StandbyValidators.Length / 2 + 1, StandbyValidators).ToScriptHash()
+                            ScriptHash = Contract.CreateSignatureRedeemScript(StandbyValidators[0]).ToScriptHash()
                         }
                     },
                     Witnesses = new[]
@@ -213,7 +213,9 @@ namespace Neo.Ledger
 
         public static UInt160 GetConsensusAddress(ECPoint[] validators)
         {
-            return Contract.CreateMultiSigRedeemScript(validators.Length - (validators.Length - 1) / 3, validators).ToScriptHash();
+            byte[] script = Contract.CreateSignatureRedeemScript(validators[0]);
+            UInt160 hash = script.ToScriptHash();
+            return hash;
         }
 
         public IEnumerable<Transaction> GetMemoryPool()

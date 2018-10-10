@@ -267,6 +267,7 @@ namespace Neo.Persistence
                     hashSet.Add(Blockchain.StandbyValidators[i]);
                 result = hashSet;
             }
+
             return result.OrderBy(p => p);
         }
     }
