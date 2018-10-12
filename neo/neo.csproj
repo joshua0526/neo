@@ -39,7 +39,6 @@
     <PackageReference Include="Microsoft.AspNetCore.WebSockets" Version="2.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.1" />
-    <PackageReference Include="Neo.VM" Version="2.3.1.1" />
     <PackageReference Include="System.Text.Encodings.Web" Version="4.5.0" />
   </ItemGroup>
 
@@ -47,6 +46,10 @@
     <PackageReference Include="Replicon.Cryptography.SCrypt">
       <Version>1.1.6.13</Version>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\neo-vm\src\neo-vm\neo-vm.csproj" />
   </ItemGroup>
 
 </Project>

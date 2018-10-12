@@ -11,6 +11,7 @@ using Neo.Persistence;
 using Neo.Plugins;
 using Neo.SmartContract;
 using Neo.VM;
+using Neo.Wallets;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -34,6 +35,24 @@ namespace Neo.Ledger
         public static readonly uint[] GenerationAmount = { 8, 7, 6, 5, 4, 3, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
         public static readonly TimeSpan TimePerBlock = TimeSpan.FromSeconds(SecondsPerBlock);
         public static readonly ECPoint[] StandbyValidators = Settings.Default.StandbyValidators.OfType<string>().Select(p => ECPoint.DecodePoint(p.HexToBytes(), ECCurve.Secp256r1)).ToArray();
+
+        public static ECPoint[] StandbyValidators1() {
+            ECPoint[] StandbyValidators1 = null;
+            string[] s = {"0327da12b5c40200e9f65569476bbff2218da4f32548ff43b6387ec1416a231ee8",
+                                  "026ce35b29147ad09e4afe4ec4a7319095f08198fa8babbe3c56e970b143528d22",
+                                  "0209e7fd41dfb5c2f8dc72eb30358ac100ea8c72da18847befe06eade68cebfcb9",
+                                  "039dafd8571a641058ccc832c5e2111ea39b09c0bde36050914384f7a48bce9bf9",
+                                  "038dddc06ce687677a53d54f096d2591ba2302068cf123c1f2d75c2dddc5425579",
+                                  "02d02b1873a0863cd042cc717da31cea0d7cf9db32b74d4c72c01b0011503e2e22",
+                                  "034ff5ceeac41acf22cd5ed2da17a6df4dd8358fcb2bfb1a43208ad0feaab2746b" };
+            return StandbyValidators1 = s.OfType<string>().Select(p => ECPoint.DecodePoint(p.HexToBytes(), ECCurve.Secp256r1)).ToArray();
+        }
+
+        public static UInt160 getScriptHash()
+        {
+            ECPoint[] StandbyValidators = StandbyValidators1();
+            return Contract.CreateMultiSigRedeemScript(StandbyValidators.Length / 2 + 1, StandbyValidators).ToScriptHash();
+        }
 
 #pragma warning disable CS0612
         public static readonly RegisterTransaction GoverningToken = new RegisterTransaction
@@ -64,14 +83,14 @@ namespace Neo.Ledger
             Witnesses = new Witness[0]
         };
 #pragma warning restore CS0612
-
+      
         public static readonly Block GenesisBlock = new Block
         {
             PrevHash = UInt256.Zero,
             Timestamp = (new DateTime(2016, 7, 15, 15, 8, 21, DateTimeKind.Utc)).ToTimestamp(),
             Index = 0,
             ConsensusData = 2083236893, //向比特币致敬
-            NextConsensus = GetConsensusAddress(StandbyValidators),
+            NextConsensus = GetConsensusAddress(StandbyValidators1()),
             Witness = new Witness
             {
                 InvocationScript = new byte[0],
@@ -98,8 +117,9 @@ namespace Neo.Ledger
                         new TransactionOutput
                         {
                             AssetId = GoverningToken.Hash,
-                            Value = GoverningToken.Amount,
-                            ScriptHash = Contract.CreateSignatureRedeemScript(StandbyValidators[0]).ToScriptHash()
+                            Value = GoverningToken.Amount,                           
+                            //ScriptHash = Contract.CreateSignatureRedeemScript(StandbyValidators[0]).ToScriptHash()                           
+                            ScriptHash = getScriptHash()
                         }
                     },
                     Witnesses = new[]
@@ -242,6 +262,9 @@ namespace Neo.Ledger
                 if (block.Index <= Height) continue;
                 if (block.Index != Height + 1)
                     throw new InvalidOperationException();
+               // if (block.Index == blocks.Count()) {
+                block.NextConsensus = "AUP3LYdrjrC58Gvpk6Ws13a8kkfsUPrYdu".ToScriptHash();
+               // }
                 Persist(block);
                 SaveHeaderHashList();
             }
